@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thoughts4food</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">T4F</div>
+          <div>
+            <p class="eyebrow">nutrition coach</p>
+            <h1>Thoughts4food</h1>
+          </div>
+        </div>
+
+        <nav class="topnav">
+          <a href="#">Overview</a>
+          <a href="#">Recipes</a>
+          <a href="#">Progress</a>
+        </nav>
+
+        <button class="pill-button ghost">Upgrade</button>
+      </header>
+
+      <main class="dashboard">
+        <section class="panel upload-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow muted">photo upload</p>
+              <h2>Scan your plate</h2>
+            </div>
+            <span class="status-dot">AI ready</span>
+          </div>
+
+          <div class="photo-card">
+            <div class="image-frame">
+              <div class="image-overlay">
+                <div class="scan-ring"></div>
+                <div class="scan-label">food check + nutrition read</div>
+              </div>
+            </div>
+
+            <div class="upload-actions">
+              <label class="primary-button">
+                <input type="file" />
+                Upload photo
+              </label>
+              <button class="secondary-button">Use camera</button>
+            </div>
+          </div>
+
+          <div class="meal-tags">
+            <span>fiber boost</span>
+            <span>high protein</span>
+            <span>low sugar</span>
+          </div>
+        </section>
+
+        <aside class="panel result-panel">
+          <div class="result-top">
+            <div>
+              <p class="eyebrow muted">nutrition profile</p>
+              <h3>Salmon grain bowl</h3>
+            </div>
+            <div class="confidence-badge">92% match</div>
+          </div>
+
+          <div class="macro-grid">
+            <div class="macro-card calories">
+              <span>Calories</span>
+              <strong>548</strong>
+              <small>kcal</small>
+            </div>
+            <div class="macro-card protein">
+              <span>Protein</span>
+              <strong>36g</strong>
+            </div>
+            <div class="macro-card carbs">
+              <span>Carbs</span>
+              <strong>42g</strong>
+            </div>
+            <div class="macro-card fat">
+              <span>Fat</span>
+              <strong>22g</strong>
+            </div>
+          </div>
+
+          <div class="micronutrient-card">
+            <div class="mini-header">
+              <span>Micros</span>
+              <a href="#">View details</a>
+            </div>
+
+            <ul class="nutrient-list">
+              <li>
+                <span>Vitamin D</span>
+                <strong>72%</strong>
+              </li>
+              <li>
+                <span>Omega-3</span>
+                <strong>68%</strong>
+              </li>
+              <li>
+                <span>Iron</span>
+                <strong>31%</strong>
+              </li>
+              <li>
+                <span>Potassium</span>
+                <strong>54%</strong>
+              </li>
+            </ul>
+          </div>
+
+          <div class="insight-bar">
+            <div>
+              <span class="label">Fuel score</span>
+              <strong>8.7/10</strong>
+            </div>
+            <div class="progress-track">
+              <span></span>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <section class="lower-grid">
+        <div class="panel breakdown-panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="eyebrow muted">ingredient breakdown</p>
+              <h2>What’s in the bowl</h2>
+            </div>
+          </div>
+
+          <div class="ingredient-list">
+            <div class="ingredient-item">
+              <div class="ingredient-meta">
+                <span class="ingredient-dot salmon"></span>
+                <span>Salmon</span>
+              </div>
+              <strong>180 kcal</strong>
+            </div>
+            <div class="ingredient-item">
+              <div class="ingredient-meta">
+                <span class="ingredient-dot avocado"></span>
+                <span>Avocado</span>
+              </div>
+              <strong>140 kcal</strong>
+            </div>
+            <div class="ingredient-item">
+              <div class="ingredient-meta">
+                <span class="ingredient-dot greens"></span>
+                <span>Greens</span>
+              </div>
+              <strong>92 kcal</strong>
+            </div>
+            <div class="ingredient-item">
+              <div class="ingredient-meta">
+                <span class="ingredient-dot grain"></span>
+                <span>Quinoa</span>
+              </div>
+              <strong>136 kcal</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel coach-panel">
+          <div class="panel-header compact">
+            <div>
+              <p class="eyebrow muted">coach note</p>
+              <h2>Performance pick</h2>
+            </div>
+          </div>
+
+          <div class="coach-card">
+            <div class="avatar-ring">
+              <div class="avatar">N</div>
+            </div>
+            <div>
+              <h4>Nina, nutrition coach</h4>
+              <p>
+                “This plate hits a great balance of protein and healthy fats. Add a squeeze of lemon if you want more brightness without extra calories.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
