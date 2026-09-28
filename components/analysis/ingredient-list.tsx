@@ -1,0 +1,4 @@
+import { Badge } from "@/components/ui/badge";
+import type { IngredientObservation } from "@/lib/analysis/types";
+
+export function IngredientList({ ingredients }: { ingredients: IngredientObservation[] }) { return <div><h3 className="font-semibold">Ingredients</h3><ul className="mt-3 space-y-2">{ingredients.map((ingredient) => <li key={ingredient.name} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[hsl(var(--border))] px-3 py-2 text-sm"><span>{ingredient.name}</span><Badge className={ingredient.evidenceStatus === "visible" || ingredient.evidenceStatus === "user-confirmed" ? "bg-emerald-100 text-emerald-950" : "bg-amber-100 text-amber-950"}>{ingredient.evidenceStatus === "hidden-possible" ? "Possible, not confirmed" : ingredient.evidenceStatus}</Badge></li>)}</ul></div>; }

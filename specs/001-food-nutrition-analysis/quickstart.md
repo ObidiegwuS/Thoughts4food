@@ -49,4 +49,14 @@ Before production changes merge, run Playwright browser scenarios and focused un
 
 Use the Vercel preview deployment to repeat the browser scenarios against a production-like environment before release.
 
+## Validation Record
+
+Local production validation completed on 2026-09-27:
+
+- Single-food request: `succeeded`, one food item.
+- Multi-food request: `succeeded`, three food items and a combined summary.
+- Unclear sauce request: `succeeded`, portion represented as a range.
+- Blurry image request: `insufficient-quality`, no food items or nutrition values.
+- Vercel preview validation: not run because this workspace has no Vercel project connection or `VERCEL_TOKEN`.
+
 Use [data-model.md](data-model.md) for entity and state rules and [analysis-ui-contract.md](contracts/analysis-ui-contract.md) for observable result requirements.
