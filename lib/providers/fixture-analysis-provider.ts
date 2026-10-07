@@ -4,6 +4,85 @@ import { findDietaryConflicts } from "@/lib/analysis/dietary-conflicts";
 import type { AnalysisProvider } from "@/lib/providers/analysis-provider";
 import type { FoodItem } from "@/lib/analysis/types";
 
+export const foodSearchCatalog = [
+  "salmon",
+  "salmon grain bowl",
+  "chicken",
+  "grilled chicken",
+  "rice",
+  "brown rice",
+  "broccoli",
+  "vegetable bowl",
+  "meal"
+] as const;
+
+const foodPhraseCatalog = Array.from(new Set(foodSearchCatalog.map((phrase) => phrase.trim().toLowerCase().replace(/\s+/g, " "))))
+  .sort((left, right) => right.split(/\s+/).length - left.split(/\s+/).length || right.length - left.length);
+
+export function parseFoodSearchTerms(query: string): string[] {
+  if (!query) return [];
+
+  const normalizedWords = query
+    .replace(/&/g, " and ")
+    .replace(/\s+and\s+/gi, " ")
+    .replace(/[\n\r]+/g, ",")
+    .split(/\s*,\s*|\s*\|\s*|\s*\/\s*|\s+/)
+    .flatMap((segment) => segment.split(/\s*\|\s*|\s*\/\s*/))
+    .map((term) => term.trim())
+    .filter(Boolean)
+    .filter((term) => !/^(and|or|with|plus)$/i.test(term));
+
+  const matchedTerms: string[] = [];
+  let index = 0;
+
+  while (index < normalizedWords.length) {
+    const remaining = normalizedWords.slice(index);
+    const phraseMatch = foodPhraseCatalog.find((phrase) => {
+      const phraseWords = phrase.split(/\s+/);
+      if (phraseWords.length > remaining.length) return false;
+      return remaining.slice(0, phraseWords.length).join(" ") === phrase;
+    });
+
+    if (phraseMatch) {
+      matchedTerms.push(phraseMatch);
+      index += phraseMatch.split(/\s+/).length;
+      continue;
+    }
+
+    matchedTerms.push(normalizedWords[index]);
+    index += 1;
+  }
+
+  return Array.from(new Set(matchedTerms.map((term) => term.replace(/\s+/g, " ").trim()).filter(Boolean)));
+}
+
+export function appendFoodSearchTerm(currentValue: string, suggestion: string): string {
+  const trimmedCurrent = currentValue.trim();
+  const trimmedSuggestion = suggestion.trim();
+
+  if (!trimmedCurrent) return trimmedSuggestion;
+  if (!trimmedSuggestion) return trimmedCurrent;
+
+  const alreadyPresent = parseFoodSearchTerms(trimmedCurrent).includes(trimmedSuggestion);
+  if (alreadyPresent) return trimmedCurrent;
+
+  const hasComma = trimmedCurrent.includes(",");
+  const currentEndsWithComma = /,$/.test(trimmedCurrent);
+
+  if (hasComma && !currentEndsWithComma) {
+    const lastSegment = trimmedCurrent.split(",").at(-1)?.trim() ?? "";
+    if (lastSegment) {
+      return `${trimmedCurrent}, ${trimmedSuggestion}`;
+    }
+  }
+
+  if (currentEndsWithComma) {
+    return `${trimmedCurrent} ${trimmedSuggestion}`;
+  }
+
+  return `${trimmedCurrent} ${trimmedSuggestion}`;
+}
+
 const baseNutrition = (calories: number, protein: number, carbohydrates: number, fat: number) => ({
   calories,
   protein,
@@ -34,18 +113,45 @@ export const fixtureFoods: FoodItem[] = [
   item({ itemId: "broccoli", displayName: "Broccoli", nutrition: baseNutrition(55, 4, 11, 1), ingredients: [{ name: "Broccoli", evidenceStatus: "visible", allergenStatus: "none" }], micronutrients: [{ nutrientName: "Vitamin C", value: "84%", availabilityStatus: "estimated" }] })
 ];
 
+const matchFoodByQuery = (query: string): FoodItem[] => {
+  const normalizedQuery = query.toLowerCase();
+  const terms = parseFoodSearchTerms(query);
+  const catalogue = [
+    { keywords: ["salmon", "salmon bowl", "salmon grain", "grain bowl"], food: fixtureFoods[0] },
+    { keywords: ["chicken", "grilled chicken"], food: fixtureFoods[1] },
+    { keywords: ["rice", "brown rice"], food: fixtureFoods[2] },
+    { keywords: ["broccoli", "veggies"], food: fixtureFoods[3] }
+  ];
+
+  const seen = new Map<string, FoodItem>();
+  for (const term of terms.length > 0 ? terms : [normalizedQuery]) {
+    const matchedFood = catalogue.find(({ keywords }) => keywords.some((keyword) => term.includes(keyword) || keyword.includes(term)))?.food;
+    if (matchedFood) seen.set(matchedFood.itemId, matchedFood);
+  }
+
+  if (seen.size > 0) return [...seen.values()];
+
+  const matches = catalogue.filter(({ keywords }) => keywords.some((keyword) => normalizedQuery.includes(keyword))).map(({ food }) => food);
+  if (matches.length > 0) return matches;
+
+  const exact = fixtureFoods.find((food) => normalizedQuery.includes(food.displayName.toLowerCase().replace(/[^a-z\s]/g, "")));
+  return exact ? [exact] : [fixtureFoods[0]];
+};
+
 export const fixtureProvider: AnalysisProvider = {
   async analyze(request) {
-    const foods = (request.imageReference.includes("meal") ? fixtureFoods.slice(1) : [fixtureFoods[0]]).map((food) => {
-      const ingredients = /allergen/i.test(request.imageReference) ? [...food.ingredients, { name: "Peanuts", evidenceStatus: "user-confirmed" as const, allergenStatus: "identified" as const }] : food.ingredients;
+    const querySource = (request.foodQuery ?? request.imageReference ?? "single-food").trim();
+    const matchedFoods = matchFoodByQuery(querySource);
+    const foods = matchedFoods.map((food) => {
+      const ingredients = /allergen/i.test(querySource) ? [...food.ingredients, { name: "Peanuts", evidenceStatus: "user-confirmed" as const, allergenStatus: "identified" as const }] : food.ingredients;
       const updatedFood = {
         ...food,
         ingredients,
-        portion: /large/i.test(request.imageReference) ? { amount: 1.75, unit: "servings", basis: "Visible larger-than-standard serving", certainty: "estimated" as const, assumptionText: "The serving looks larger than a standard portion, so the estimate is scaled up." } : /unclear|sauce/i.test(request.imageReference) ? { amount: { min: 0.75, max: 1.5 }, unit: "servings", basis: "Portion boundaries are not clear", certainty: "range" as const, assumptionText: "The portion is shown as a range because its boundaries are unclear." } : food.portion,
-        uncertaintyReasons: /large|unclear|sauce/i.test(request.imageReference) ? Array.from(new Set([...food.uncertaintyReasons, /large/i.test(request.imageReference) ? "The visible serving is unusually large." : "The portion or hidden sauce is not fully visible."])) : food.uncertaintyReasons
+        portion: /large/i.test(querySource) ? { amount: 1.75, unit: "servings", basis: "Visible larger-than-standard serving", certainty: "estimated" as const, assumptionText: "The serving looks larger than a standard portion, so the estimate is scaled up." } : /unclear|sauce/i.test(querySource) ? { amount: { min: 0.75, max: 1.5 }, unit: "servings", basis: "Portion boundaries are not clear", certainty: "range" as const, assumptionText: "The portion is shown as a range because its boundaries are unclear." } : food.portion,
+        uncertaintyReasons: /large|unclear|sauce/i.test(querySource) ? Array.from(new Set([...food.uncertaintyReasons, /large/i.test(querySource) ? "The visible serving is unusually large." : "The portion or hidden sauce is not fully visible."])) : food.uncertaintyReasons
       };
       return { ...updatedFood, allergens: normalizeAllergenFindings(ingredients), dietaryConflicts: findDietaryConflicts(updatedFood, request.restrictions) };
     });
-    return { requestId: request.requestId, status: "succeeded", imageReference: request.imageReference, qualityIssues: [], createdAt: new Date().toISOString(), foodItems: foods, mealSummary: buildMealSummary(foods) };
+    return { requestId: request.requestId ?? crypto.randomUUID(), status: "succeeded", imageReference: querySource, qualityIssues: [], createdAt: new Date().toISOString(), foodItems: foods, mealSummary: buildMealSummary(foods) };
   }
 };

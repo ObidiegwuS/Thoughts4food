@@ -99,9 +99,10 @@ export interface AnalysisResult {
 }
 
 export interface AnalysisRequest {
-  requestId: string;
-  imageReference: string;
-  mimeType: string;
-  sizeBytes: number;
+  requestId?: string;
+  imageReference?: string;
+  foodQuery?: string;
+  mimeType?: string;
+  sizeBytes?: number;
   restrictions: string[];
 }
