@@ -71,7 +71,7 @@ export default function HomePage() {
       <div id="recipe-search" className="min-w-0 overflow-hidden rounded-[28px] border border-white/[0.08] bg-[rgba(13,18,25,0.94)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:p-7">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div><p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#91a0af]">Ingredient search</p><h1 className="mt-1 text-3xl font-black tracking-tight text-[#f0f4f8] sm:text-4xl">Find your next meal</h1></div>
-          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#76efb5]/25 bg-[#76efb5]/[0.08] px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-[#76efb5]"><span className="size-1.5 rounded-full bg-[#76efb5] shadow-[0_0_10px_#76efb5]" /> Ingredients ready</span>
+          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#76efb5]/25 bg-[#76efb5]/[0.08] px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-[#76efb5]"><span className="size-1.5 rounded-full bg-[#76efb5] shadow-[0_0_10px_#76efb5]" /> Recipe search</span>
         </div>
 
         <div className="relative mb-5 flex min-h-[205px] flex-col justify-between overflow-hidden rounded-[22px] border border-white/[0.08] bg-[radial-gradient(ellipse_at_18%_12%,_rgba(75,164,132,.35),_transparent_38%),radial-gradient(ellipse_at_90%_80%,_rgba(236,148,75,.24),_transparent_42%),linear-gradient(135deg,_#18251f,_#17202c_55%,_#281f28)] p-5 sm:min-h-[245px] sm:p-7">
@@ -121,7 +121,10 @@ export default function HomePage() {
           </ul>}
           {formError && <p id="ingredient-error" role="alert" className="mt-2 text-sm font-medium text-[#ff9a91]">{formError}</p>}
         </form>
-        <p className="mt-4 flex items-center gap-2 text-xs leading-5 text-[#8c99a5]"><ShieldCheck size={15} className="shrink-0 text-[#76efb5]" aria-hidden="true" /> Recipes link to their original publishers. Check allergy and nutrition details on the source site.</p>
+        <div className="mt-4 space-y-2 text-xs leading-5 text-[#8c99a5]">
+          <p className="flex items-center gap-2"><ShieldCheck size={15} className="shrink-0 text-[#76efb5]" aria-hidden="true" /> Recipes link to their original publishers. Check allergy and nutrition details on the source site.</p>
+          <p className="border-l-2 border-[#f0b96a]/55 pl-3 text-[#b6c0c9]">Spoonacular is used when configured. Without its key, searches use TheMealDB; nutrition may be unavailable.</p>
+        </div>
       </div>
 
       <aside id="recipe-results" aria-labelledby="results-title" className="min-w-0 overflow-hidden rounded-[28px] border border-white/[0.08] bg-[rgba(13,18,25,0.94)] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:p-6">
@@ -135,7 +138,7 @@ export default function HomePage() {
             <div className="relative max-w-md">
               <span className="inline-flex items-center gap-2 rounded-full border border-[#f0b96a]/25 bg-[#f0b96a]/[0.08] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#f0c987]"><Sparkles size={13} aria-hidden="true" /> Kitchen inspiration</span>
               <h3 className="mt-5 text-3xl font-black leading-tight text-white">A new meal is one good idea away.</h3>
-              <p className="mt-3 text-sm leading-6 text-[#aebac5]">Enter what’s in your kitchen. We’ll find real publisher recipes and show their ingredient matches and nutrition when available.</p>
+              <p className="mt-3 text-sm leading-6 text-[#aebac5]">Enter what’s in your kitchen. We’ll search real recipe providers and show ingredient matches and nutrition when available.</p>
             </div>
             <div id="nutrition-guide" className="relative mt-8 grid grid-cols-3 gap-2">
               <div className="rounded-xl border border-[#76efb5]/15 bg-[#76efb5]/[0.06] p-3"><p className="text-[10px] font-bold uppercase text-[#83eab5]">Match</p><p className="mt-1 text-xs text-[#c3cdd3]">Your pantry</p></div>

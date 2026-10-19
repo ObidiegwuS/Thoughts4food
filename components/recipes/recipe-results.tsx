@@ -14,10 +14,6 @@ interface RecipeResultsProps {
   message?: string;
 }
 
-function formatNumber(value: number | null, suffix = ""): string | null {
-  return value === null ? null : `${Number.isInteger(value) ? value : value.toFixed(1)}${suffix}`;
-}
-
 function RecipeImage({ src, alt }: { src: string; alt: string }) {
   const [unavailable, setUnavailable] = useState(false);
   if (unavailable) return null;
@@ -48,7 +44,7 @@ export function RecipeResults({ recipes, requestedIngredients, message }: Recipe
   return <section aria-labelledby="recipe-results-title" className="space-y-4">
     <div className="flex flex-wrap items-end justify-between gap-3 px-1">
       <div>
-        <p className="text-xs font-bold uppercase text-[#f08a68]">Thoughts4food picks</p>
+        <p className="text-xs font-bold uppercase text-[#f08a68]">Recipe matches</p>
         <h2 id="recipe-results-title" className="mt-1 text-2xl font-black text-[#f0f4f8]">Fresh from the recipe feed</h2>
         <p className="mt-1 text-sm text-[#a7b2bf]">Publisher recipes ranked by how many of your ingredients they use.</p>
       </div>
@@ -56,31 +52,22 @@ export function RecipeResults({ recipes, requestedIngredients, message }: Recipe
       {message && <p role="status" className="w-full text-sm text-[#f2c987]">{message}</p>}
     </div>
 
-    <section aria-labelledby="nutrition-comparison-title" className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#141a22]">
+    <section aria-labelledby="ingredient-match-title" className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#141a22]">
       <div className="border-b border-white/[0.08] bg-[linear-gradient(100deg,_rgba(240,138,104,.11),_rgba(164,154,250,.10),_rgba(118,239,181,.07))] px-4 py-3">
-        <h3 id="nutrition-comparison-title" className="font-semibold text-[#f0f4f8]">Nutrition comparison</h3>
-        <p className="mt-1 text-xs text-[#a0adba]">Provider estimates per serving. Values vary with brands, ingredient quantities, substitutions, and preparation.</p>
+        <h3 id="ingredient-match-title" className="font-semibold text-[#f0f4f8]">Ingredient match</h3>
+        <p className="mt-1 text-xs text-[#a0adba]">Compare how many of your ingredients appear in each recipe.</p>
       </div>
       <div className="min-w-0 max-w-full overflow-x-auto">
-        <table className="min-w-[620px] w-full border-collapse text-left text-sm">
+        <table className="min-w-[420px] w-full border-collapse text-left text-sm">
           <thead className="bg-[#1a222c] text-xs uppercase text-[#a0adba]">
             <tr>
-              <th scope="col" className="sticky left-0 bg-[#1a222c] px-4 py-3">Per serving</th>
+              <th scope="col" className="sticky left-0 bg-[#1a222c] px-4 py-3">Ingredients matched</th>
               {recipes.map((recipe, index) => <th scope="col" key={recipe.id} className={`min-w-36 px-4 py-3 align-top normal-case ${["text-[#ffad91]", "text-[#91edba]", "text-[#f2c987]", "text-[#c2bbff]"][index % 4]}`}>{recipe.title}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.06] text-[#d7dfe6]">
-            {([
-              ["Calories", (recipe: RecipeSearchItem) => formatNumber(recipe.caloriesPerServing, " kcal")],
-              ["Protein", (recipe: RecipeSearchItem) => formatNumber(recipe.proteinGramsPerServing, " g")],
-              ["Carbohydrates", (recipe: RecipeSearchItem) => formatNumber(recipe.carbohydratesGramsPerServing, " g")],
-              ["Fat", (recipe: RecipeSearchItem) => formatNumber(recipe.fatGramsPerServing, " g")]
-            ] as const).map(([label, getValue]) => <tr key={label}>
-              <th scope="row" className="sticky left-0 bg-[#141a22] px-4 py-3 font-medium text-[#b9c4ce]">{label}</th>
-              {recipes.map((recipe) => <td key={recipe.id} className="px-4 py-3">{getValue(recipe) ?? "Unavailable"}</td>)}
-            </tr>)}
             <tr>
-              <th scope="row" className="sticky left-0 bg-[#141a22] px-4 py-3 font-medium text-[#b9c4ce]">Ingredients used</th>
+              <th scope="row" className="sticky left-0 bg-[#141a22] px-4 py-3 font-medium text-[#b9c4ce]">Your ingredients used</th>
               {recipes.map((recipe) => <td key={recipe.id} className="px-4 py-3">{recipe.usedIngredients.length} of {requestedIngredients.length}</td>)}
             </tr>
           </tbody>
@@ -90,13 +77,6 @@ export function RecipeResults({ recipes, requestedIngredients, message }: Recipe
 
     <div className="grid gap-4 xl:grid-cols-2">
       {recipes.map((recipe) => {
-        const nutrition = [
-          ["Calories", formatNumber(recipe.caloriesPerServing, " kcal")],
-          ["Protein", formatNumber(recipe.proteinGramsPerServing, " g protein")],
-          ["Carbohydrates", formatNumber(recipe.carbohydratesGramsPerServing, " g carbohydrates")],
-          ["Fat", formatNumber(recipe.fatGramsPerServing, " g fat")]
-        ] as const;
-        const hasNutrition = nutrition.some(([, value]) => value !== null);
         const matchingIngredientCount = recipe.usedIngredients.filter((ingredient) => requestedIngredients.some((requested) => requested.toLocaleLowerCase() === ingredient.toLocaleLowerCase())).length;
 
         const isSaved = savedRecipeIds.has(recipe.id);
@@ -136,28 +116,17 @@ export function RecipeResults({ recipes, requestedIngredients, message }: Recipe
               <span className="font-semibold text-[#91edba]">Uses {matchingIngredientCount} of {requestedIngredients.length} ingredients</span>
             </div>
 
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase text-[#9ba8b4]">Estimated per serving</p>
-              {hasNutrition ? <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {nutrition.map(([name, value], index) => <div key={name} className={`rounded-xl border border-white/[0.05] px-3 py-2 ${["bg-[#36211f]", "bg-[#172c28]", "bg-[#1b2434]", "bg-[#30232c]"][index]}`}>
-                  <dt className={`text-[11px] font-medium uppercase ${["text-[#f3ad82]", "text-[#8ae8bd]", "text-[#a8baf2]", "text-[#eaa0c3]"][index]}`}>{name}</dt>
-                  <dd className="mt-1 font-semibold text-[#f0f4f8]">{value ?? "Unavailable"}</dd>
-                </div>)}
-              </dl> : <p className="rounded-xl border border-white/[0.06] bg-[#1a222c] px-3 py-2 text-sm text-[#a0adba]">Nutrition unavailable from the recipe provider.</p>}
-              {hasNutrition && <p className="mt-2 text-xs text-[#8f9ca8]">Actual nutrition can vary with ingredient brands, quantities, substitutions, and preparation.</p>}
-            </div>
-
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <h4 className="text-sm font-semibold text-[#8ae8bd]">Matched to your list ({matchingIngredientCount})</h4>
                 {recipe.usedIngredients.length > 0
-                  ? <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#c0cbd4]">{recipe.usedIngredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}</ul>
+                  ? <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#c0cbd4]">{recipe.usedIngredients.map((ingredient, index) => <li key={`${recipe.id}-used-${index}`}>{ingredient}</li>)}</ul>
                   : <p className="mt-1 text-sm text-[#8f9ca8]">No submitted ingredients were matched.</p>}
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-[#f2bd72]">Additional ingredients needed ({recipe.missingIngredients.length})</h4>
                 {recipe.missingIngredients.length > 0
-                  ? <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#c0cbd4]">{recipe.missingIngredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}</ul>
+                  ? <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#c0cbd4]">{recipe.missingIngredients.map((ingredient, index) => <li key={`${recipe.id}-missing-${index}`}>{ingredient}</li>)}</ul>
                   : <p className="mt-1 text-sm text-[#8f9ca8]">No additional ingredients listed by the provider.</p>}
               </div>
             </div>
@@ -194,7 +163,7 @@ export function RecipeResults({ recipes, requestedIngredients, message }: Recipe
       })}
     </div>
 
-    <p className="text-xs leading-5 text-[#8794a1]">Recipe data and images provided by <a href="https://spoonacular.com/food-api" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#91edba] underline underline-offset-2">Spoonacular</a>. Nutrition values are provider estimates when supplied; follow the linked publisher page for the authoritative recipe and instructions.</p>
+    <p className="text-xs leading-5 text-[#8794a1]">Recipe information and images are attributed to the provider and original publisher. Follow the linked recipe page for nutrition details and cooking instructions.</p>
     <span className="sr-only">Search included: {requestedIngredients.join(", ")}</span>
     {selectedRecipe && <Dialog open title="You're leaving Thoughts4food" onClose={() => setSelectedRecipe(null)} descriptionId="external-recipe-description">
       <ExternalRecipeConfirmation recipe={selectedRecipe} onStay={() => setSelectedRecipe(null)} />

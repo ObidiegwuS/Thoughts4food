@@ -2,10 +2,17 @@ import { NextResponse } from "next/server";
 import { normalizeIngredients } from "@/lib/analysis/ingredients";
 import { RecipeSearchError } from "@/lib/recipes/types";
 import { searchSpoonacularRecipes } from "@/lib/recipes/spoonacular";
+import { searchTheMealDbRecipes } from "@/lib/recipes/themealdb";
 
 const maxIngredients = 20;
 const maxIngredientLength = 80;
 const maxRequestBytes = 16 * 1024;
+
+export async function searchRecipesWithConfiguredProvider(ingredients: string[]) {
+  return process.env.SPOONACULAR_API_KEY?.trim()
+    ? searchSpoonacularRecipes(ingredients)
+    : searchTheMealDbRecipes(ingredients);
+}
 
 async function readRequestJson(request: Request): Promise<unknown> {
   if (!request.body) throw new SyntaxError("Missing request body");
@@ -36,10 +43,10 @@ function responseForError(error: unknown) {
     return NextResponse.json({ recipes: [], message: "Recipe search is temporarily unavailable. Please try again." }, { status: 502 });
   }
   const messages = {
-    "not-configured": "Recipe search is not configured yet. Add SPOONACULAR_API_KEY to the server environment.",
+    "not-configured": "Recipe search is temporarily unavailable. Please try again later.",
     "invalid-key": "Recipe search credentials were rejected. Check the server-side SPOONACULAR_API_KEY setting.",
     "rate-limit": "Recipe search is busy right now. Please wait a moment and try again.",
-    quota: "The recipe provider quota has been reached. Check your Spoonacular plan and try again later.",
+    quota: "The recipe provider request limit has been reached. Please try again later.",
     timeout: "Recipe search took too long to respond. Please try again.",
     provider: "Recipe search is temporarily unavailable. Please try again."
   } satisfies Record<RecipeSearchError["code"], string>;
@@ -80,7 +87,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ recipes: [], message: "Use up to 20 ingredients, with no ingredient longer than 80 characters." }, { status: 400 });
     }
 
-    const result = await searchSpoonacularRecipes(ingredients);
+    const result = await searchRecipesWithConfiguredProvider(ingredients);
     return NextResponse.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return responseForError(error);

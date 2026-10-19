@@ -22,23 +22,16 @@ const recipe: RecipeSearchItem = {
 };
 
 describe("recipe results", () => {
-  it("renders source attribution, ingredient match counts, comparison, and ingredient details", () => {
+  it("renders source attribution, ingredient match comparison, and ingredient details without nutrition facts", () => {
     render(<RecipeResults recipes={[recipe]} requestedIngredients={["chicken", "rice", "tomatoes"]} />);
 
     expect(screen.getByRole("button", { name: /view original recipe/i })).toBeInTheDocument();
     expect(screen.getByText("Uses 2 of 3 ingredients")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /nutrition comparison/i })).toBeInTheDocument();
-    expect(screen.getAllByText("Unavailable").length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { name: /ingredient match/i })).toBeInTheDocument();
+    expect(screen.queryByText(/calories|protein|carbohydrates|fat|nutrition unavailable/i)).not.toBeInTheDocument();
     expect(screen.getByText("Matched to your list (2)")).toBeInTheDocument();
     expect(screen.getByText("View Ingredients")).toBeInTheDocument();
     expect(screen.getByText("olive oil")).toBeInTheDocument();
-    expect(screen.getByText(/actual nutrition can vary/i)).toBeInTheDocument();
-  });
-
-  it("clearly reports nutrition unavailable when no nutrients are supplied", () => {
-    render(<RecipeResults recipes={[{ ...recipe, caloriesPerServing: null, proteinGramsPerServing: null, carbohydratesGramsPerServing: null, fatGramsPerServing: null }]} requestedIngredients={["chicken", "rice"]} />);
-    expect(screen.getByText(/nutrition unavailable from the recipe provider/i)).toBeInTheDocument();
-    expect(screen.getByRole("row", { name: /calories unavailable/i })).toBeInTheDocument();
   });
 
   it("shows an actionable empty-results message", () => {

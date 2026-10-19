@@ -1,3 +1,3 @@
 import { LoaderCircle } from "lucide-react";
 
-export function AnalysisProgress() { return <div role="status" aria-live="polite" className="flex items-center gap-3 rounded-2xl bg-[hsl(var(--muted))] p-4 text-sm"><LoaderCircle className="animate-spin" size={18} aria-hidden="true" /><span>Searching real recipes with your ingredients...</span></div>; }
+export function AnalysisProgress() { return <div role="status" aria-live="polite" className="flex items-center gap-3 rounded-2xl bg-[hsl(var(--muted))] p-4 text-sm"><LoaderCircle className="animate-spin" size={18} aria-hidden="true" /><span>Searching real recipe providers with your ingredients...</span></div>; }

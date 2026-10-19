@@ -17,7 +17,7 @@ const recipeResult = (id: string, title: string) => ({
   preparationTimeMinutes: 30
 });
 
-test("submits normalized ingredients and shows a safe setup state when recipe credentials are absent", async ({ page }) => {
+test("submits normalized ingredients and searches recipes without Spoonacular credentials", async ({ page }) => {
   await page.goto("/");
   const ingredientField = page.getByRole("textbox", { name: /what ingredients do you have/i });
   await expect(ingredientField).toBeVisible();
@@ -28,11 +28,12 @@ test("submits normalized ingredients and shows a safe setup state when recipe cr
   await expect(page.getByRole("list", { name: /ingredients to search/i }).getByText("rice")).toBeVisible();
   await expect(page.getByRole("list", { name: /ingredients to search/i }).getByText("broccoli")).toBeVisible();
   await page.getByRole("button", { name: /find recipes/i }).click();
-  await expect(page.getByText(/SPOONACULAR_API_KEY/i)).toBeVisible();
-  await expect(page.getByRole("heading", { name: /what we can see/i })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /fresh from the recipe feed/i })).toBeVisible({ timeout: 20000 });
+  await expect(page.getByRole("button", { name: /view original recipe/i }).first()).toBeVisible({ timeout: 20000 });
+  await expect(page.getByText(/nutrition unavailable from the recipe provider/i).first()).toBeVisible();
 });
 
-test("shows recipe cards, comparison, loading skeletons, and expandable ingredients", async ({ page }) => {
+test("shows recipe cards, ingredient comparison, loading skeletons, and expandable ingredients without nutrition facts", async ({ page }) => {
   await page.context().route("https://publisher.example/**", async (route) => route.fulfill({
     status: 200,
     contentType: "text/html",
@@ -59,8 +60,9 @@ test("shows recipe cards, comparison, loading skeletons, and expandable ingredie
   await expect(page.getByRole("button", { name: /remove chicken rice bowl from saved recipes/i })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: /remove chicken rice bowl from saved recipes/i }).click();
   await expect(page.getByRole("button", { name: /save chicken rice bowl/i })).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByRole("heading", { name: /nutrition comparison/i })).toBeVisible();
-  await expect(page.getByRole("row", { name: /calories 425 kcal 425 kcal 425 kcal/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /ingredient match/i })).toBeVisible();
+  await expect(page.getByRole("row", { name: /your ingredients used 2 of 3 2 of 3 2 of 3/i })).toBeVisible();
+  await expect(page.getByText(/calories|protein|carbohydrates|estimated per serving/i)).toHaveCount(0);
   await expect(page.getByText("Uses 2 of 3 ingredients").first()).toBeVisible();
 
   const ingredientDisclosure = page.locator("summary", { hasText: "View Ingredients" }).first();

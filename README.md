@@ -11,18 +11,18 @@ npm run dev
 
 Open `http://localhost:3000/`.
 
-Recipe search uses the Spoonacular Food API from a server-only route. The API key is read only by the server and must never use a `NEXT_PUBLIC_` prefix.
+Recipe search prefers Spoonacular when `SPOONACULAR_API_KEY` is configured and otherwise falls back to TheMealDB's documented free development API key. Both providers are called only from the server route. API keys must never use a `NEXT_PUBLIC_` prefix.
 
 ## Configure Recipe Search
 
-1. Create a Spoonacular Food API account at [spoonacular.com/food-api/console](https://spoonacular.com/food-api/console), choose a plan, and copy your API key. Check the plan's current request/point quotas before use.
-2. Copy `.env.example` to `.env.local` in the repository root.
-3. Set `SPOONACULAR_API_KEY` in `.env.local` to your key. Do not commit `.env.local` or share the key in browser code, screenshots, logs, or support requests.
-4. Restart `npm run dev`, enter ingredients, then choose **Find Recipes**. Without a key, the UI shows a setup message and does not return provider details.
+1. For local development, no key is required: ingredient searches use TheMealDB's documented test key `1`.
+2. For Spoonacular results, create an account at [spoonacular.com/food-api/console](https://spoonacular.com/food-api/console), choose a plan, and copy its API key. Check current request/point quotas before use.
+3. Copy `.env.example` to `.env.local` in the repository root, then set `SPOONACULAR_API_KEY` to opt into Spoonacular. Keep it blank to use TheMealDB. For public production use of TheMealDB, obtain a supporter API key and set optional `THEMEALDB_API_KEY`.
+4. Never commit `.env.local` or expose either key in browser code, screenshots, logs, or support requests. Restart `npm run dev` after changing environment variables, enter ingredients, and choose **Find Recipes**.
 
 For deployment, add `SPOONACULAR_API_KEY` as a server-side environment variable in your hosting provider's project settings. Do not configure it as a public/build-exposed variable.
 
-The server queries Spoonacular's official [Search Recipes by Ingredients](https://spoonacular.com/food-api/docs#Search-Recipes-by-Ingredients) endpoint, ranked to maximize used ingredients, and fetches full details for the highest-ranked candidates. Results are normalized, source-linked to their original publishers, and show only provider-returned values. Recipe instructions are not copied into Thoughts4food. Spoonacular requires attribution to original recipe sources and restricts caching: this integration sends `no-store` requests and does not persist provider results. Review the current [Spoonacular terms](https://spoonacular.com/food-api/terms) and subscription quotas before production use.
+With Spoonacular configured, the server uses its official [ingredient search](https://spoonacular.com/food-api/docs#Search-Recipes-by-Ingredients), ranked to maximize used ingredients, then fetches details for candidates. Without Spoonacular, it uses TheMealDB's official [ingredient filter](https://www.themealdb.com/api.php) per submitted ingredient and looks up the full meal records. Results are normalized and source-linked. Nutrition is shown only when returned by the provider; TheMealDB does not supply nutrition in these endpoints, so it is displayed as unavailable. Recipe instructions are not copied. Both integrations request fresh responses without local caching. Review the [Spoonacular terms](https://spoonacular.com/food-api/terms) and TheMealDB's [API terms](https://www.themealdb.com/terms_of_use.php) before public production use.
 
 The original `Mockup/` directory remains a static visual reference. The Next.js app is the working recipe-search experience.
 
@@ -36,4 +36,4 @@ npm run test:e2e
 
 ## Vercel
 
-Import the repository into Vercel or run `npx vercel`. Set `SPOONACULAR_API_KEY` under the project's server environment variables for each environment that should provide recipe search. Preview deployments should run the same build and browser checks before production promotion.
+Import the repository into Vercel or run `npx vercel`. Set `SPOONACULAR_API_KEY` for Spoonacular, or the supporter `THEMEALDB_API_KEY` for public TheMealDB use, as server environment variables. Preview deployments should run the same build and browser checks before production promotion.
