@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: 32 48% 96%;
-  --foreground: 155 22% 15%;
-  --card: 38 55% 99%;
-  --card-foreground: 160 21% 13%;
-  --primary: 161 42% 29%;
-  --primary-foreground: 40 30% 97%;
-  --muted: 32 30% 91%;
-  --muted-foreground: 155 10% 38%;
-  --border: 28 25% 83%;
-  --ring: 161 42% 29%;
+  --background: 220 24% 7%;
+  --foreground: 210 25% 94%;
+  --card: 216 22% 10%;
+  --card-foreground: 210 25% 94%;
+  --primary: 154 68% 66%;
+  --primary-foreground: 220 24% 8%;
+  --muted: 216 18% 15%;
+  --muted-foreground: 215 12% 65%;
+  --border: 215 15% 23%;
+  --ring: 154 68% 66%;
 }
 
 * { box-sizing: border-box; }
@@ -21,10 +21,9 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    radial-gradient(circle at 8% 4%, rgba(249, 115, 76, 0.16), transparent 24rem),
-    radial-gradient(circle at 94% 9%, rgba(246, 190, 75, 0.19), transparent 22rem),
-    radial-gradient(circle at 90% 72%, rgba(72, 152, 125, 0.09), transparent 28rem),
-    linear-gradient(180deg, #fff8f0 0%, #fffdfa 48%, #f5f8f2 100%);
+    radial-gradient(circle at 3% 0%, rgba(45, 106, 102, 0.2), transparent 28rem),
+    radial-gradient(circle at 96% 4%, rgba(146, 70, 113, 0.12), transparent 26rem),
+    linear-gradient(140deg, #0b0e13 0%, #10151d 52%, #0b1114 100%);
   color: hsl(var(--foreground));
   font-family: "Inter", "Segoe UI", sans-serif;
 }

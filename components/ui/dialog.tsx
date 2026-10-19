@@ -36,7 +36,7 @@ export function Dialog({ open, title, children, onClose, descriptionId }: { open
 			event.preventDefault();
 			first.focus();
 		}
-	}} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 text-[hsl(var(--card-foreground))] shadow-2xl backdrop:bg-black/45 sm:max-h-[calc(100dvh-3rem)] sm:p-6">
+	}} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border border-white/[0.12] bg-[#151b23] p-5 text-[#eff4f8] shadow-2xl backdrop:bg-black/70 sm:max-h-[calc(100dvh-3rem)] sm:p-6">
 			<div className="flex items-start justify-between gap-4">
 				<h2 id={titleId} className="text-lg font-semibold">{title}</h2>
 				<Button type="button" variant="ghost" size="sm" aria-label="Close dialog" onClick={onClose}><X size={18} aria-hidden="true" /></Button>

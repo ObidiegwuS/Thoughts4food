@@ -48,7 +48,7 @@ test("shows recipe cards, comparison, loading skeletons, and expandable ingredie
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /thoughts4food/i }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /thoughts4food home/i })).toBeVisible();
   await page.getByRole("textbox", { name: /what ingredients do you have/i }).fill("chicken, rice, tomato");
   await page.getByRole("button", { name: /find recipes/i }).click();
 
