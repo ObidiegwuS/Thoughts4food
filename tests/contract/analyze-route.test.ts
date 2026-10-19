@@ -32,6 +32,22 @@ describe("analysis route", () => {
     expect(result.foodItems.some((food: { displayName: string }) => food.displayName.toLowerCase().includes("broccoli"))).toBe(true);
   });
 
+  it("accepts a structured ingredient list and removes duplicates", async () => {
+    const response = await POST(new Request("http://localhost/api/analyze", { method: "POST", body: JSON.stringify({ ingredients: [" salmon ", "rice", "SALMON"], restrictions: [] }) }));
+    const result = await response.json();
+    expect(response.status).toBe(200);
+    expect(result.status).toBe("succeeded");
+    expect(result.imageReference).toBe("salmon, rice");
+    expect(result.foodItems).toHaveLength(2);
+  });
+
+  it("rejects an empty ingredient submission with a helpful message", async () => {
+    const response = await POST(new Request("http://localhost/api/analyze", { method: "POST", body: JSON.stringify({ ingredients: ["  ", ""], restrictions: [] }) }));
+    const result = await response.json();
+    expect(response.status).toBe(400);
+    expect(result.qualityIssues).toContain("Add at least one ingredient to get started.");
+  });
+
   it("splits natural-language and comma-separated entries into individual food terms", () => {
     expect(parseFoodSearchTerms("salmon and rice, broccoli")).toEqual(["salmon", "rice", "broccoli"]);
     expect(parseFoodSearchTerms(" chicken & brown rice ")).toEqual(["chicken", "brown rice"]);

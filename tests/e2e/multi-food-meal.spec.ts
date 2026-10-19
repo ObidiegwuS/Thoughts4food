@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("keeps meal analysis ready for separate item and combined results", async ({ page }) => {
+test("explains how recipe results are ranked before a search", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText(/assumptions left visible/i)).toBeVisible();
+  await expect(page.getByText(/ranked by ingredient match/i)).toBeVisible();
 });

@@ -102,6 +102,7 @@ export interface AnalysisRequest {
   requestId?: string;
   imageReference?: string;
   foodQuery?: string;
+  ingredients?: string[];
   mimeType?: string;
   sizeBytes?: number;
   restrictions: string[];

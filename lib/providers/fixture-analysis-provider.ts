@@ -140,7 +140,7 @@ const matchFoodByQuery = (query: string): FoodItem[] => {
 
 export const fixtureProvider: AnalysisProvider = {
   async analyze(request) {
-    const querySource = (request.foodQuery ?? request.imageReference ?? "single-food").trim();
+    const querySource = (request.ingredients?.join(", ") || request.foodQuery || request.imageReference || "single-food").trim();
     const matchedFoods = matchFoodByQuery(querySource);
     const foods = matchedFoods.map((food) => {
       const ingredients = /allergen/i.test(querySource) ? [...food.ingredients, { name: "Peanuts", evidenceStatus: "user-confirmed" as const, allergenStatus: "identified" as const }] : food.ingredients;

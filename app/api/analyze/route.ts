@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { validateImage } from "@/lib/analysis/image-validation";
+import { normalizeIngredients } from "@/lib/analysis/ingredients";
 import { fixtureProvider } from "@/lib/providers/fixture-analysis-provider";
 import type { AnalysisRequest } from "@/lib/analysis/types";
 
@@ -8,7 +9,9 @@ export async function POST(request: Request) {
     const contentLength = Number(request.headers.get("content-length") ?? 0);
     if (contentLength > 12 * 1024 * 1024) return NextResponse.json({ status: "failed", foodItems: [], qualityIssues: ["The request is too large. Please choose an image smaller than 10 MB."] }, { status: 413 });
     const body = (await request.json()) as Partial<AnalysisRequest>;
-    const foodQuery = (body.foodQuery ?? "").trim();
+    const ingredients = normalizeIngredients(Array.isArray(body.ingredients) ? body.ingredients.filter((value): value is string => typeof value === "string") : []);
+    const foodQuery = ingredients.length > 0 ? ingredients.join(", ") : (body.foodQuery ?? "").trim();
+    if (!foodQuery && (body.ingredients !== undefined || body.foodQuery !== undefined)) return NextResponse.json({ status: "failed", foodItems: [], qualityIssues: ["Add at least one ingredient to get started."] }, { status: 400 });
     const imageReference = body.imageReference ?? (foodQuery || "single-food");
     const qualityIssues = /blurry/i.test(imageReference) ? ["The image appears blurry, so the food cannot be identified confidently."] : /dark|poor-light/i.test(imageReference) ? ["The image is too dark to support a reliable estimate."] : /obstructed|cropped/i.test(imageReference) ? ["The food is obstructed or too tightly cropped."] : undefined;
     const validation = validateImage({
@@ -21,7 +24,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ requestId: body.requestId ?? crypto.randomUUID(), status: validation.status, qualityIssues: validation.issues, foodItems: [] }, { status: validation.status === "failed" ? 400 : 200 });
     }
     const result = await Promise.race([
-      fixtureProvider.analyze({ requestId: body.requestId ?? crypto.randomUUID(), imageReference, foodQuery, mimeType: body.mimeType ?? "image/jpeg", sizeBytes: body.sizeBytes ?? 1, restrictions: body.restrictions ?? [] }),
+      fixtureProvider.analyze({ requestId: body.requestId ?? crypto.randomUUID(), imageReference, foodQuery, ingredients, mimeType: body.mimeType ?? "image/jpeg", sizeBytes: body.sizeBytes ?? 1, restrictions: body.restrictions ?? [] }),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Analysis timed out")), 4500))
     ]);
     return NextResponse.json(result);

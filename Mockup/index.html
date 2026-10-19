@@ -34,28 +34,23 @@
         <section class="panel upload-panel">
           <div class="panel-header">
             <div>
-              <p class="eyebrow muted">photo upload</p>
+              <p class="eyebrow muted">recipe search</p>
               <h2>Scan your plate</h2>
             </div>
             <span class="status-dot">AI ready</span>
           </div>
 
-          <div class="photo-card">
-            <div class="image-frame">
-              <div class="image-overlay">
-                <div class="scan-ring"></div>
-                <div class="scan-label">food check + nutrition read</div>
-              </div>
+          <form class="ingredient-form" novalidate>
+            <label for="ingredient-input">What ingredients do you have?</label>
+            <textarea id="ingredient-input" placeholder="Example: chicken, rice, eggs, spinach, cheese, tomatoes" aria-describedby="ingredient-help"></textarea>
+            <p class="form-help" id="ingredient-help">Separate items with commas or new lines. Use Ctrl+Enter to search.</p>
+            <ul class="ingredient-chips" aria-label="Ingredients to search" hidden></ul>
+            <div class="ingredient-actions">
+              <button class="secondary-button add-ingredient" type="button">Add ingredient</button>
+              <button class="primary-button find-recipes" type="submit">Find Recipes</button>
             </div>
-
-            <div class="upload-actions">
-              <label class="primary-button">
-                <input type="file" />
-                Upload photo
-              </label>
-              <button class="secondary-button">Use camera</button>
-            </div>
-          </div>
+            <p class="form-message" role="alert" aria-live="polite" hidden></p>
+          </form>
 
           <div class="meal-tags">
             <span>fiber boost</span>
